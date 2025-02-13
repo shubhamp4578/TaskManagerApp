@@ -8,6 +8,8 @@ import SignUp from '../screens/SignUp';
 import {isUserFirstTime, isUserLoggedIn} from '../utils/storage';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import CustomDrawerContent from '../navigation/CustomDrawerContent';
+import AddTasks from '../screens/AddTasks';
+import Settings from '../screens/Settings';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -62,6 +64,8 @@ const AppNavigator = () => {
         <Stack.Screen name="LoginScreen" component={LoginScreen} />
         <Stack.Screen name="HomeScreenDrawer" component={DrawerNavigator} />
         <Stack.Screen name="SignUpScreen" component={SignUp} />
+        <Stack.Screen name="AddTasks" component={AddTasks} />
+        <Stack.Screen name="Settings" component={Settings} />
       </Stack.Navigator>
     </NavigationContainer>
   );

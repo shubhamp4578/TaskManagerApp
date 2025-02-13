@@ -1,22 +1,34 @@
-import{ getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,GoogleAuthProvider, signInWithCredential } from '@react-native-firebase/auth';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  deleteUser,
+  GoogleAuthProvider,
+  signInWithCredential,
+} from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 
 const auth = getAuth();
 
+const configureGoogle = () => {
 //Configure Google Sign-In
 GoogleSignin.configure({
   webClientId:
     '622398171108-43vl97fcsbuhpso861uq71i0vu919gq6.apps.googleusercontent.com',
+  offlineAccess: false,
 });
+};
 
 //SignUp with email and password
 export const signUp = async (email, password) => {
   try {
-    const userCredential = await createUserWithEmailAndPassword(auth,
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
       email,
       password,
     );
-    console.log('User detail ',userCredential.user);
+    console.log('User detail ', userCredential.user);
     return {user: userCredential.user, error: null};
   } catch (error) {
     let errorMessage;
@@ -40,14 +52,14 @@ export const signUp = async (email, password) => {
 //Login with Email and Password
 export const login = async (email, password) => {
   try {
-    const userCredential = await signInWithEmailAndPassword(auth,
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
       email,
       password,
     );
     return {user: userCredential.user, error: null};
   } catch (error) {
-     //let errorMessage = 'Something went wrong. Please try again.';
-     let errorMessage;
+    let errorMessage;
     if (error.code === 'auth/user-not-found') {
       errorMessage = 'No account found with this email.';
     } else if (error.code === 'auth/invalid-credential') {
@@ -61,16 +73,15 @@ export const login = async (email, password) => {
   }
 };
 
-
-
 //SignIn with Google
 export const googleSignIn = async () => {
   try {
+    configureGoogle();
     await GoogleSignin.hasPlayServices();
     const {idToken} = await GoogleSignin.signIn();
     const googleCredential = GoogleAuthProvider.credential(idToken);
     const userCredential = await signInWithCredential(auth, googleCredential);
-    return { user: userCredential.user, error: null };
+    return {user: userCredential.user, error: null};
   } catch (error) {
     console.log(error);
     return {user: null, error: 'Google Sign-In failed. Please try again.'};
@@ -81,7 +92,9 @@ export const googleSignIn = async () => {
 export const logout = async () => {
   try {
     await signOut(auth);
+    await GoogleSignin.revokeAccess();
     await GoogleSignin.signOut();
+    await signOut(auth);
     return {success: true, error: null};
   } catch (error) {
     return {
@@ -91,27 +104,38 @@ export const logout = async () => {
   }
 };
 
-
 //Password Reset link
-export const resetPassword = async (email) => {
+export const resetPassword = async email => {
   try {
     await auth().sendPasswordResetEmail(email);
     return {success: true};
   } catch (error) {
-    return{success : false, error:error.code};
+    return {success: false, error: error.code};
   }
 };
 
 //Delete the User
-export const deleteUser = async () => {
+export const deleteCurrentUser = async () => {
   try {
-    const user = auth().currentUser;
-    if(user) {
-      await user.delete();
-      console.warn('User Deleted from firebase auth');
+    const user = auth.currentUser;
+
+    if (user) {
+      await deleteUser(user);
+      console.log('User deleted successfully from Firebase Authentication!');
+      return {success: true, error: null};
+    } else {
+      console.log('No user is currently signed in.');
+      return {success: false, error: 'No authenticated user found.'};
     }
   } catch (error) {
-    console.error('Error deleting the user ',error);
+    console.error('Error deleting user:', error);
+    let errorMessage = 'Something went wrong. Please try again.';
+
+    if (error.code === 'auth/requires-recent-login') {
+      errorMessage =
+        'This operation requires recent authentication. Please log in again and try deleting.';
+    }
+
+    return {success: false, error: errorMessage};
   }
 };
-

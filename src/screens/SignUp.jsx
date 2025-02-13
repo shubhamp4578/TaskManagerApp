@@ -1,9 +1,10 @@
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import React, {useState} from 'react';
-import {signUp} from '../services/firebaseAuth';
+import {deleteCurrentUser, signUp} from '../services/firebaseAuth';
 import InputText from '../components/InputText';
 import CustomButton from '../components/CustomButton';
 import CustomDialog from '../components/CustomDialog';
+import { setUser } from '../services/firebaseStorage';
 
 const SignUp = ({navigation}) => {
   const [firstName, setFirstName] = useState('');
@@ -52,9 +53,16 @@ const SignUp = ({navigation}) => {
 
     if (user) {
       console.log('got the user details');
-      setSuccessMessage('Account Created Successfully');
-      setModalVisible(true);
-      console.log('got the user details');
+      const userName = `${firstName} ${lastName}`;
+      const isUserSaved = await setUser(email, userName);
+      if(isUserSaved) {
+        setSuccessMessage('Account created successfully!');
+        setModalVisible(true);
+      } else {
+          await deleteCurrentUser();
+          setErrorMessage('Account creation failed. Please try again');
+          setModalVisible(true);
+      }
     } else {
       setErrorMessage(error);
       setModalVisible(true);

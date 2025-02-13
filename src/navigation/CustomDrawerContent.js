@@ -10,7 +10,10 @@ const renderIcon =
 
 export default function CustomDrawerContent(props) {
   const [isDarkMode, setIsDarkMode] = useState(false);
-
+  const showSettingPage = () => {
+    props.navigation.navigate('Settings');
+    props.navigation.closeDrawer();
+  };
   return (
     <View style={styles.container} collapsable={false}>
       <DrawerContentScrollView
@@ -55,7 +58,7 @@ export default function CustomDrawerContent(props) {
           <DrawerItem
             label="Settings"
             icon={renderIcon('settings')}
-            onPress={() => console.log('Settings Clicked')}
+            onPress={showSettingPage}
           />
           <DrawerItem
             label="Logout"
@@ -75,6 +78,7 @@ export default function CustomDrawerContent(props) {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

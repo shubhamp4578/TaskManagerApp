@@ -20,6 +20,7 @@ export const isUserFirstTime = async () => {
 
 export const setUserLoggedIn = async (loggedIn,email) => {
     try {
+        console.log(email);
         await AsyncStorage.setItem('isUserLoggedIn',JSON.stringify(loggedIn));
         await AsyncStorage.setItem('userEmail',email);
     } catch (error) {
@@ -32,6 +33,16 @@ export const isUserLoggedIn = async () => {
         return value;
     }catch (error) {
         console.error('Error gettitng user Email:',error);
+        return false;
+    }
+};
+
+export const getUserEmail = async () => {
+    try {
+        const value = await AsyncStorage.getItem('userEmail');
+        return value;
+    } catch (error) {
+        console.error('Error while getting the user email ',error);
         return false;
     }
 };
