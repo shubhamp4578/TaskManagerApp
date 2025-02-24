@@ -4,6 +4,7 @@ import Swiper from 'react-native-swiper';
 import LottieView from 'lottie-react-native';
 import CustomButton from '../components/CustomButton';
 import { setUserFirstTime } from '../utils/storage';
+import useTheme from '../hooks/useTheme';
 
 const slides = [
   {
@@ -27,6 +28,7 @@ const slides = [
 ];
 
 const IntroScreen = ({navigation}) => {
+  const {styles} = useTheme(getStyles);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handleStartedFlow =  async () =>{
@@ -67,9 +69,10 @@ const IntroScreen = ({navigation}) => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (theme) => StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: theme.background,
   },
   slide: {
     flex: 1,
@@ -83,6 +86,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     position: 'absolute',
     top: 100,
+    color: theme.text,
   },
   animation: {
     flex: 1,
@@ -96,6 +100,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 140,
     width: '80%',
+    color: theme.text,
   },
   buttonContainer: {
     position: 'absolute',

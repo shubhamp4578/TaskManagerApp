@@ -46,6 +46,21 @@ export const getUserEmail = async () => {
         return false;
     }
 };
+export const getUserLoggedIn = async () => {
+    try {
+        const loggedIn = await AsyncStorage.getItem('isUserLoggedIn');
+        const email = await AsyncStorage.getItem('userEmail');
+
+        console.log('Retrieved email type:', typeof email, 'Value:', email);
+        console.log('Retrieved isUserLoggedIn type:', typeof loggedIn, 'Value:', loggedIn);
+
+        return { loggedIn: JSON.parse(loggedIn), email };
+    } catch (error) {
+        console.error('Error retrieving login status: ', error);
+        return null;
+    }
+};
+
 
 export const clearUserSession = async () => {
     try {
@@ -53,5 +68,22 @@ export const clearUserSession = async () => {
         await AsyncStorage.removeItem('userEmail');
     } catch (error) {
         console.error('Error clearing session :', error);
+    }
+};
+
+export const storeData = async (key, value) => {
+    try {
+        await AsyncStorage.setItem(key,value);
+    } catch (error) {
+        console.error('Error while storing data,',error);
+    }
+};
+export const getData = async (key) => {
+    try {
+        let value = await AsyncStorage.getItem(key);
+        console.log(`value is ${value} and its type is ${typeof value}`);
+        return value;
+    } catch (error) {
+        console.log('Error occured while fetching data:- ',error);
     }
 };

@@ -2,10 +2,12 @@ import { View, Text, StyleSheet } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import { fetchThoughtOfTheDay } from '../services/api';
 import { ActivityIndicator, Card } from 'react-native-paper';
+import useTheme from '../hooks/useTheme';
 
 const ThoughtOfTheDay = () => {
     const [thought,setThought] = useState(null);
     const [loading, setLoading] = useState(true);
+    const {styles} = useTheme(getStyles);
 
     useEffect(()=>{
         const getThought = async() => {
@@ -33,31 +35,35 @@ const ThoughtOfTheDay = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (theme) => StyleSheet.create({
     thoughtContainer:{
         marginTop:10,
         paddingHorizontal:16,
+        backgroundColor:theme.background,
     },
     card:{
-        backgroundColor:'#ffffff',
+        backgroundColor:theme.background,
         padding:10,
         borderRadius:10,
-        elevation:3,
-        shadowColor:'#000',
-        shadowOffset:{width:0,height:2},
-        shadowOpacity:0.2,
+        elevation:10,
+        shadowColor:theme.shadowColor,
+        shadowOffset:{width:0,height:5},
+        shadowOpacity:0.9,
         shadowRadius:4,
+        marginTop:8,
     },
     quoteText: {
         fontSize: 16,
         fontStyle: 'italic',
         textAlign:'center',
         marginBottom:8,
+        color:theme.text,
     },
     authorText:{
         fontSize:14,
         fontWeight:'bold',
         textAlign:'right',
+        color:theme.text,
     },
 });
 export default ThoughtOfTheDay;

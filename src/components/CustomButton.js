@@ -1,5 +1,6 @@
 import {Text, TouchableOpacity, StyleSheet, View, Image} from 'react-native';
 import React from 'react';
+import useTheme from '../hooks/useTheme';
 
 const CustomButton = ({
   text = 'Processing...',
@@ -8,6 +9,7 @@ const CustomButton = ({
   type = 'primary',
   icon,
 }) => {
+  const { styles } = useTheme(getStyles);
   return (
     <View>
       <TouchableOpacity
@@ -23,7 +25,7 @@ const CustomButton = ({
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (theme) => StyleSheet.create({
   button: {
     paddingHorizontal:20,
     height:50,
@@ -34,7 +36,7 @@ const styles = StyleSheet.create({
     alignItems:'center',
   },
   secondaryButton: {
-    backgroundColor: '#fff',
+    backgroundColor: theme.background,
     borderWidth:1,
     borderColor: '#ccc',
   },
@@ -44,7 +46,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   secondaryButtonText:{
-    color:'#333',
+    color:theme.text,
   },
   icon:{
     width:24,

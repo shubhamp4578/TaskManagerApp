@@ -1,15 +1,17 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 
-const TaskCard = ({title, description, startDate, endDate,priority, color}) => {
+const TaskCard = ({title, description, startDate, endDate, priority, color, onLongPress}) => {
     return (
-        <View style={[styles.card, {backgroundColor: color}]}>
-            <Text style={styles.title}>{title}</Text>
-            <Text style={styles.description}>{description}</Text>
-            <Text style={styles.date}>Start: {startDate}</Text>
-            <Text style={styles.date}>End: {endDate}</Text>
-            <Text style={styles.priority}>{priority}</Text>
-        </View>
+        <TouchableOpacity onLongPress={onLongPress} activeOpacity={0.7}>
+            <View style={[styles.card, {backgroundColor: color}]}>
+                <Text style={styles.title}>{title}</Text>
+                <Text style={styles.description}>{description}</Text>
+                <Text style={styles.date}>Start Date: {startDate}</Text>
+                <Text style={styles.date}>End Date: {endDate}</Text>
+                <Text style={styles.priority}>{priority}</Text>
+            </View>
+        </TouchableOpacity>
     );
 };
 
@@ -45,6 +47,5 @@ const styles = StyleSheet.create({
         marginTop:5,
     },
 });
-
 
 export default TaskCard;

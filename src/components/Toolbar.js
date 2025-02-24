@@ -3,12 +3,16 @@ import React from 'react';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { clearUserSession } from '../utils/storage';
 import Icon from 'react-native-vector-icons/Feather';
+import { useDispatch } from 'react-redux';
+import { clearUser } from '../redux/userSlice';
 
 const Toolbar = ({title,showLogout = true,showDrawer = true}) => {
     const navigation = useNavigation();
+    const dispatch = useDispatch();
 
     const handleLogout = async() =>{
         await clearUserSession();
+        dispatch(clearUser());
         navigation.replace('LoginScreen');
     };
   return (

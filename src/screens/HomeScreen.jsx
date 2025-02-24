@@ -7,10 +7,11 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import OnGoingTasks from './OnGoingTasks';
 import CompletedTasks from './CompletedTasks';
 import Toolbar from '../components/Toolbar';
+import useTheme from '../hooks/useTheme';
 
 const Tab = createMaterialTopTabNavigator();
-
 const HomeScreen = () => {
+  const {theme, styles} = useTheme(getStyles);
   return (
     <View style={styles.container}>
       <Toolbar
@@ -18,43 +19,28 @@ const HomeScreen = () => {
       showDrawer={true}
       showLogout={true}
       />
+      <View style={styles.navigationView}>
       <Tab.Navigator
         screenOptions={{
-          tabBarLabelStyle: {fontSize: 12, fontWeight: 'bold'},
+          tabBarLabelStyle: {fontSize: 12, fontWeight: 'bold',color:theme.text},
           tabBarIndicatorStyle: {backgroundColor: '#4CAF50'},
-          tabBarStyle: {backgroundColor: '#f5f5f5'},
+          tabBarStyle: {backgroundColor:theme.background },
         }}>
-        <Tab.Screen name="OnGoing/Upcomming Tasks" component={OnGoingTasks} />
+        <Tab.Screen name="OnGoing/Upcomming Tasks" component={OnGoingTasks} options={{}}/>
         <Tab.Screen name="Completed Tasks" component={CompletedTasks} />
       </Tab.Navigator>
+      </View>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (theme) => StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor:theme.background,
   },
-  toolbar: {
-    height: 60,
-    flexDirection: 'row',
-    paddingHorizontal: 10,
-    backgroundColor: '#4CAF50',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    flex: 1,
-    textAlign: 'center',
-  },
-  tabContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+  navigationView: {
+    flex:1,
   },
 });
 

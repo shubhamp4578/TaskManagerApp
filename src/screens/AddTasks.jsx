@@ -15,7 +15,8 @@ import CustomDialog from '../components/CustomDialog';
 import {useNavigation} from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {addTask} from '../services/firebaseStorage';
-import {getUserEmail} from '../utils/storage';
+import { useSelector } from 'react-redux';
+import useTheme from '../hooks/useTheme';
 
 const AddTasks = () => {
   const [title, setTitle] = useState('');
@@ -28,10 +29,12 @@ const AddTasks = () => {
   const [dialogVisible, setDialogVisible] = useState(false);
   const [dialogMessage, setDialogMessage] = useState('');
   const [dialogType, setDialogType] = useState('success');
+  const {theme,styles} = useTheme(getStyles);
 
   const navigation = useNavigation();
 
   const categories = ['Priority', 'Quick Action', 'Progress', 'Optional'];
+  const {email} = useSelector(state=> state.user);
 
   const handleCreateTask = async () => {
     if (!title || !description) {
@@ -48,8 +51,6 @@ const AddTasks = () => {
       category,
       createdAt: new Date().toISOString(),
     };
-    const email = getUserEmail();
-    console.log(email?._j);
     console.log(`Email is ${JSON.stringify(email)} and task is ${JSON.stringify(taskData)}`);
     const isTaskAdded = await addTask(email, taskData);
     if (isTaskAdded) {
@@ -87,6 +88,7 @@ const AddTasks = () => {
           multiline={true}
           numberOfLines={4}
           textAlignVertical="top"
+          placeholderTextColor={theme.text}
         />
 
         <TouchableOpacity
@@ -157,10 +159,10 @@ const AddTasks = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: theme.background,
   },
   formContainer: {
     padding: 20,
@@ -169,7 +171,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 15,
-    backgroundColor: '#fff',
+    backgroundColor: theme.background,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#ccc',
@@ -178,23 +180,24 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 16,
     marginLeft: 10,
-    color: '#333',
+    color: theme.text,
   },
   descriptionInput: {
     height: 120,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 10,
-    backgroundColor: '#fff',
+    backgroundColor: theme.background,
     padding: 10,
     fontSize: 16,
     marginBottom: 15,
+    color:theme.text,
   },
   radioTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 8,
-    color: '#333',
+    color: theme.text,
   },
   radioButton: {
     flexDirection: 'row',
@@ -214,7 +217,7 @@ const styles = StyleSheet.create({
   },
   radioText: {
     fontSize: 16,
-    color: '#333',
+    color: theme.text,
   },
   radioSelected: {
     width: 12,

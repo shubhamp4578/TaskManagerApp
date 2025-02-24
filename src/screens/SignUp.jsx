@@ -5,6 +5,7 @@ import InputText from '../components/InputText';
 import CustomButton from '../components/CustomButton';
 import CustomDialog from '../components/CustomDialog';
 import { setUser } from '../services/firebaseStorage';
+import useTheme from '../hooks/useTheme';
 
 const SignUp = ({navigation}) => {
   const [firstName, setFirstName] = useState('');
@@ -17,6 +18,7 @@ const SignUp = ({navigation}) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const {styles} = useTheme(getStyles);
 
   const handleDialogClose = () => {
     setModalVisible(false);
@@ -138,18 +140,18 @@ const SignUp = ({navigation}) => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (theme) => StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 30,
-    backgroundColor: '#f7f8fa',
+    backgroundColor: theme.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
   heading: {
     fontSize: 26,
     fontWeight: 'bold',
-    color: '#333',
+    color: theme.text,
     marginBottom: 30,
   },
   loginContainer: {
@@ -158,7 +160,7 @@ const styles = StyleSheet.create({
   },
   loginText: {
     fontSize: 14,
-    color: '#333',
+    color: theme.text,
   },
   loginLink: {
     fontSize: 14,
