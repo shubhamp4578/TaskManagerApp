@@ -5,65 +5,23 @@ import {
   ToastAndroid,
   Alert,
   ScrollView,
-  Modal,
-  TouchableOpacity,
 } from 'react-native';
-import React, {useCallback, useState} from 'react';
+import React, {useState} from 'react';
 import ThoughtOfTheDay from '../components/ThoughtOfTheDay';
 import {useSelector} from 'react-redux';
-import {deleteTask, getTasks} from '../services/firebaseStorage';
-import {useFocusEffect} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import TaskCard from '../components/TaskCard';
 import {formatDate} from '../utils/helper';
+import useTheme from '../hooks/useTheme';
+import useTasks from '../hooks/useTasks';
+import TaskModal from '../components/TaskModal';
 
 const CompletedTasks = () => {
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const email = useSelector(state => state.user.email);
+  const {styles} = useTheme(getStyles);
+  const {tasks, loading, removeTask} = useTasks(email,true);
   const [selectedTask, setSelectedTask] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const email = useSelector(state => state.user.email);
-
-  const fetchTasks = useCallback(async () => {
-    if (!email) {
-      return;
-    }
-    setLoading(true);
-    try {
-      if (email) {
-        const allTasks = await getTasks(email, true);
-        const categorizedTasks = [
-          {
-            title: 'Priority Tasks',
-            data: allTasks.filter(task => task.category === 'Priority'),
-          },
-          {
-            title: 'Quick Action Tasks',
-            data: allTasks.filter(task => task.category === 'Quick Action'),
-          },
-          {
-            title: 'Progress Tasks',
-            data: allTasks.filter(task => task.category === 'Progress'),
-          },
-          {
-            title: 'Optional Tasks',
-            data: allTasks.filter(task => task.category === 'Optional'),
-          },
-        ].filter(section => section.data.length > 0);
-        setTasks(categorizedTasks);
-      }
-    } catch (error) {
-      console.error('Error fetching Tasks ', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [email]);
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchTasks();
-    }, [fetchTasks]),
-  );
 
   const handleLongPress = task => {
     setSelectedTask(task);
@@ -84,13 +42,12 @@ const CompletedTasks = () => {
           text: 'Yes',
           onPress: async () => {
             try {
-              await deleteTask(email, selectedTask.id, false);
+              await removeTask(selectedTask.id);
               ToastAndroid.show(
                 'Task Deleted successfully',
                 ToastAndroid.SHORT,
               );
               setIsModalVisible(false);
-              await fetchTasks();
             } catch (error) {
               console.error('Error deleting task: ', error);
             }
@@ -130,28 +87,20 @@ const CompletedTasks = () => {
         )}
       </ScrollView>
 
-      <Modal
-        transparent={true}
-        animationType="slide"
-        visible={isModalVisible}
-        onRequestClose={() => setIsModalVisible(false)}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={handleDeleteTask}>
-              <Text style={styles.deleteModalText}>Delete Task</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      <TaskModal
+      isVisible={isModalVisible}
+      onClose={()=> setIsModalVisible(false)}
+      onDelete={handleDeleteTask}
+      isCompleted={true}
+      />
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (theme) => StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor:theme.background,
   },
   scrollContainer: {
     paddingBottom: 100,
@@ -161,11 +110,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginVertical: 10,
-    color: '#000',
+    color: theme.text,
   },
   noTasksText: {
     fontSize: 16,
-    color: '#000',
+    color: theme.text,
     textAlign: 'center',
     marginTop: 20,
   },
@@ -176,7 +125,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor:theme.background,
     padding: 20,
     borderRadius: 10,
     width: 300,

@@ -6,82 +6,36 @@ import {
   Text,
   Alert,
   ToastAndroid,
-  Modal,
 } from 'react-native';
-import React, {useCallback, useState} from 'react';
+import React, {useState} from 'react';
 import ThoughtOfTheDay from '../components/ThoughtOfTheDay';
 import Icon from 'react-native-vector-icons/Feather';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import TaskCard from '../components/TaskCard';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {
-  deleteTask,
-  getTasks,
-  moveTaskToCompleted,
-} from '../services/firebaseStorage';
+
 import {useSelector} from 'react-redux';
 import {formatDate} from '../utils/helper';
 import useTheme from '../hooks/useTheme';
+import useTasks from '../hooks/useTasks';
+import TaskModal from '../components/TaskModal';
 
 const OnGoingTasks = () => {
   const navigation = useNavigation();
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const email = useSelector(state => state.user.email);
   const {styles} = useTheme(getStyles);
+  const {tasks, loading, removeTask, moveToCompleted} = useTasks(email, false);
+
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const addTask = () => {
     navigation.navigate('AddTasks');
   };
-  const fetchTasks = useCallback(async () => {
-    if (!email) {
-      return;
-    }
-    setLoading(true);
-    try {
-      if (email) {
-        const allTasks = await getTasks(email, false);
-        const categorizedTasks = [
-          {
-            title: 'Priority Tasks',
-            data: allTasks.filter(task => task.category === 'Priority'),
-          },
-          {
-            title: 'Quick Action Tasks',
-            data: allTasks.filter(task => task.category === 'Quick Action'),
-          },
-          {
-            title: 'Progress Tasks',
-            data: allTasks.filter(task => task.category === 'Progress'),
-          },
-          {
-            title: 'Optional Tasks',
-            data: allTasks.filter(task => task.category === 'Optional'),
-          },
-        ].filter(section => section.data.length > 0);
-        setTasks(categorizedTasks);
-      }
-    } catch (error) {
-      console.error('Error fetching tasks: ', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [email]);
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchTasks();
-    }, [fetchTasks]),
-  );
   const handleLongPress = task => {
     setSelectedTask(task);
     setIsModalVisible(true);
-  };
-  const handleUpdateTask = () => {
-    console.log('Update task is clicked');
-    setIsModalVisible(false);
   };
 
   const handleDeleteTask = async () => {
@@ -97,16 +51,9 @@ const OnGoingTasks = () => {
         {
           text: 'Yes',
           onPress: async () => {
-            try {
-              await deleteTask(email, selectedTask.id, false);
-              ToastAndroid.show(
-                'Task Deleted successfully',
-                ToastAndroid.SHORT,
-              );
+            if(selectedTask) {
+              await removeTask(selectedTask.id);
               setIsModalVisible(false);
-              await fetchTasks();
-            } catch (error) {
-              console.error('Error deleting task: ', error);
             }
           },
         },
@@ -115,11 +62,12 @@ const OnGoingTasks = () => {
     );
   };
 
-  const moveToCompleted = async () => {
-    await moveTaskToCompleted(email, selectedTask.id);
+  const handleMoveToCompleted = async () => {
+    if(selectedTask){
+    await moveToCompleted(selectedTask.id);
     ToastAndroid.show('Task marked as completed', ToastAndroid.SHORT);
     setIsModalVisible(false);
-    await fetchTasks();
+    }
   };
   return (
     <SafeAreaView style={styles.container}>
@@ -157,32 +105,13 @@ const OnGoingTasks = () => {
         accessibilityLabel="Add a new task">
         <Icon name="plus" size={28} color="#fff" />
       </TouchableOpacity>
-
-      <Modal
-        transparent={true}
-        animationType="slide"
-        visible={isModalVisible}
-        onRequestClose={() => setIsModalVisible(false)}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={handleUpdateTask}>
-              <Text style={styles.modalText}>Update Task</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={moveToCompleted}>
-              <Text style={styles.modalText}>Move to Completed</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={handleDeleteTask}>
-              <Text style={styles.deleteButtonText}>Delete Task</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+        <TaskModal
+        isVisible={isModalVisible}
+        onClose={()=> setIsModalVisible(false)}
+        onDelete={handleDeleteTask}
+        onComplete={handleMoveToCompleted}
+        isCompleted={false}
+        />
     </SafeAreaView>
   );
 };
@@ -224,33 +153,6 @@ const getStyles = theme =>
       color: theme.text,
       textAlign: 'center',
       marginTop: 20,
-    },
-    modalContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'rgba(0,0,0,0.5)',
-    },
-    modalContent: {
-      backgroundColor: '#fff',
-      padding: 20,
-      borderRadius: 10,
-      width: 300,
-      alignItems: 'center',
-    },
-    modalButton: {
-      padding: 15,
-      width: '100%',
-      alignItems: 'center',
-    },
-    deleteButtonText: {
-      fontSize: 16,
-      fontWeight: 'bold',
-      color:'red',
-    },
-    modalText: {
-      fontSize: 16,
-      fontWeight: 'bold',
     },
   });
 
