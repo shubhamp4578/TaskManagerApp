@@ -12,31 +12,40 @@ import InputText from '../components/InputText';
 import Icon from 'react-native-vector-icons/Feather';
 import CustomButton from '../components/CustomButton';
 import CustomDialog from '../components/CustomDialog';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {addTask} from '../services/firebaseStorage';
+import {addTask, updateTask} from '../services/firebaseStorage';
 import { useSelector } from 'react-redux';
 import useTheme from '../hooks/useTheme';
 
 const AddTasks = () => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('Priority');
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
+  const route = useRoute();
+  const navigation = useNavigation();
+  const {theme,styles} = useTheme(getStyles);
+  const {email} = useSelector(state=> state.user);
+
+  const taskToEdit = route.params?.selectedTask || null;
+  console.log(taskToEdit);
+
+  const [title, setTitle] = useState(taskToEdit?.title || '');
+  const [description, setDescription] = useState(taskToEdit?.description || '');
+  const [category, setCategory] = useState(taskToEdit?.category || '');
+  const [startDate, setStartDate] = useState(
+    taskToEdit?.startDate ? new Date(taskToEdit?.startDate) : new Date()
+  );
+  const [endDate, setEndDate] = useState(
+    taskToEdit?.startDate ? new Date(taskToEdit?.endDate) : new Date()
+  );
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [dialogMessage, setDialogMessage] = useState('');
   const [dialogType, setDialogType] = useState('success');
-  const {theme,styles} = useTheme(getStyles);
 
-  const navigation = useNavigation();
 
   const categories = ['Priority', 'Quick Action', 'Progress', 'Optional'];
-  const {email} = useSelector(state=> state.user);
 
-  const handleCreateTask = async () => {
+  const handleTask = async () => {
     if (!title || !description) {
       setDialogMessage('Title and Description are required!');
       setDialogType('error');
@@ -51,15 +60,19 @@ const AddTasks = () => {
       category,
       createdAt: new Date().toISOString(),
     };
-    console.log(`Email is ${JSON.stringify(email)} and task is ${JSON.stringify(taskData)}`);
-    const isTaskAdded = await addTask(email, taskData);
-    if (isTaskAdded) {
-      setDialogMessage('Task created successfully!');
-      setDialogType('success');
+    let isTaskDone;
+    if(taskToEdit) {
+        isTaskDone = await updateTask(email,taskToEdit.id,taskData);
     } else {
-      setDialogMessage('Task not created due to error!');
-      setDialogType('error');
+    isTaskDone = await addTask(email, taskData);
     }
+    if (taskToEdit) {
+      setDialogMessage(isTaskDone ? 'Task updated successfully!' : 'Failed to update task.');
+    } else {
+      setDialogMessage(isTaskDone ? 'Task created successfully!' : 'Failed to create task.');
+    }
+
+    setDialogType(isTaskDone ? 'success' : 'error');
     setDialogVisible(true);
   };
 
@@ -145,7 +158,7 @@ const AddTasks = () => {
             <Text style={styles.radioText}>{item}</Text>
           </TouchableOpacity>
         ))}
-        <CustomButton text="Create Task" onPress={handleCreateTask} />
+        <CustomButton text={taskToEdit ? 'Update Task' : 'Create Task'} onPress={handleTask} />
 
         <CustomDialog
           visible={dialogVisible}

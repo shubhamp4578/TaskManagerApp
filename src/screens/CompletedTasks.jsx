@@ -18,6 +18,7 @@ import TaskModal from '../components/TaskModal';
 
 const CompletedTasks = () => {
   const email = useSelector(state => state.user.email);
+  const categoryColors = useSelector(state=> state.categoryColors);
   const {styles} = useTheme(getStyles);
   const {tasks, loading, removeTask} = useTasks(email,true);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -76,7 +77,7 @@ const CompletedTasks = () => {
                   startDate={formatDate(task.startDate)}
                   endDate={formatDate(task.endDate)}
                   priority={task.category}
-                  color="#000F34"
+                  color={categoryColors[task.category] || '#FD0362'}
                   onLongPress={() => handleLongPress(task)}
                 />
               ))}

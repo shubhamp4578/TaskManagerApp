@@ -1,7 +1,7 @@
 import React from 'react';
 import {Modal, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
-const TaskModal = ({isVisible, onClose, onDelete, onComplete, isCompleted}) => {
+const TaskModal = ({isVisible, onClose, onDelete, onComplete, isCompleted, onUpdate}) => {
   if (!isVisible) {
     return null;
   }
@@ -11,9 +11,14 @@ const TaskModal = ({isVisible, onClose, onDelete, onComplete, isCompleted}) => {
       <View style={styles.overlay}>
         <View style={styles.modalContent}>
           {!isCompleted && (
+            <>
             <TouchableOpacity style={styles.button} onPress={onComplete}>
               <Text style={styles.buttonText}>Mark as Completed</Text>
             </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={onUpdate}>
+            <Text style={styles.buttonText}>Update Task</Text>
+          </TouchableOpacity>
+          </>
           )}
           <TouchableOpacity
             style={[styles.button, styles.deleteButton]}

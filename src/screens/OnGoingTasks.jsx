@@ -13,7 +13,6 @@ import Icon from 'react-native-vector-icons/Feather';
 import {useNavigation} from '@react-navigation/native';
 import TaskCard from '../components/TaskCard';
 import {SafeAreaView} from 'react-native-safe-area-context';
-
 import {useSelector} from 'react-redux';
 import {formatDate} from '../utils/helper';
 import useTheme from '../hooks/useTheme';
@@ -23,6 +22,7 @@ import TaskModal from '../components/TaskModal';
 const OnGoingTasks = () => {
   const navigation = useNavigation();
   const email = useSelector(state => state.user.email);
+  const categoryColors = useSelector(state=> state.categoryColors);
   const {styles} = useTheme(getStyles);
   const {tasks, loading, removeTask, moveToCompleted} = useTasks(email, false);
 
@@ -69,6 +69,13 @@ const OnGoingTasks = () => {
     setIsModalVisible(false);
     }
   };
+
+  const handleUpdateTask = () => {
+    if(selectedTask) {
+      setIsModalVisible(false);
+      navigation.navigate('AddTasks', {selectedTask});
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -88,7 +95,7 @@ const OnGoingTasks = () => {
                   startDate={formatDate(task.startDate)}
                   endDate={formatDate(task.endDate)}
                   priority={task.category}
-                  color="#FD0362"
+                  color={categoryColors[task.category] || '#FD0362'}
                   onLongPress={() => handleLongPress(task)}
                 />
               ))}
@@ -111,6 +118,7 @@ const OnGoingTasks = () => {
         onDelete={handleDeleteTask}
         onComplete={handleMoveToCompleted}
         isCompleted={false}
+        onUpdate={handleUpdateTask}
         />
     </SafeAreaView>
   );

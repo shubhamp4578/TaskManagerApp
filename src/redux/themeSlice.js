@@ -17,6 +17,7 @@ const themeSlice = createSlice({
       state.theme = action.payload === 'dark' ? darkTheme : lightTheme;
     },
     setSystemTheme: (state, action) => {
+      state.themeMode = action.payload;
         state.theme = action.payload === 'dark' ? darkTheme : lightTheme;
     },
   },

@@ -1,10 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 
 const initialState = {
-  priorityTasks: [],
-  quickActionTasks: [],
-  progressTasks: [],
-  optionalTasks: [],
+  tasks:[],
   loading: false,
 };
 
@@ -13,33 +10,14 @@ const taskSlice = createSlice({
   initialState,
   reducers: {
     setTasks: (state, action) => {
-      const {category, tasks} = action.payload;
-      switch (category) {
-        case 'Priority':
-          state.priorityTasks = tasks;
-          break;
-        case 'Quick Action':
-          state.quickActionTasks = tasks;
-          break;
-        case 'Progress':
-          state.progressTasks = tasks;
-          break;
-        case 'Optional':
-          state.optionalTasks = tasks;
-          break;
-        default:
-          break;
-      }
+      state.tasks = action.payload;
     },
     setLoading: (state, action) => {
       state.loading = action.payload;
     },
 
     clearTasks: state => {
-      state.priorityTasks = [];
-      state.quickActionTasks = [];
-      state.optionalTasks = [];
-      state.progressTasks = [];
+      state.tasks = [];
     },
   },
 });

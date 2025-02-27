@@ -85,8 +85,10 @@ export const updateTask = async (
     const taskRef = doc(db, 'TaskManager', email, taskType, taskId);
     await updateDoc(taskRef, updatedData);
     console.log('Task Updated successfully!');
+    return true;
   } catch (error) {
     console.error('Error updating task: ', error);
+    return false;
   }
 };
 
@@ -121,7 +123,7 @@ export const moveTaskToCompleted = async (email, taskId) => {
   }
 };
 
-export const deleteUser = async email => {
+export const deleteUserData = async email => {
   try {
     const userRef = doc(db, 'TaskManager', email);
     const ongoingTaskCollection = collection(

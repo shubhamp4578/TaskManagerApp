@@ -10,6 +10,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import CustomDrawerContent from '../navigation/CustomDrawerContent';
 import AddTasks from '../screens/AddTasks';
 import Settings from '../screens/Settings';
+import TaskDetailScreen from '../screens/TaskDetailScreen';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -66,6 +67,7 @@ const AppNavigator = () => {
         <Stack.Screen name="SignUpScreen" component={SignUp} />
         <Stack.Screen name="AddTasks" component={AddTasks} />
         <Stack.Screen name="Settings" component={Settings} />
+        <Stack.Screen name="TaskDetail" component={TaskDetailScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

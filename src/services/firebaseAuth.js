@@ -8,6 +8,7 @@ import {
   signInWithCredential,
 } from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import { deleteUserData } from './firebaseStorage';
 
 const auth = getAuth();
 
@@ -28,7 +29,6 @@ export const signUp = async (email, password) => {
       email,
       password,
     );
-    console.log('User detail ', userCredential.user);
     return {user: userCredential.user, error: null};
   } catch (error) {
     let errorMessage;
@@ -118,8 +118,10 @@ export const resetPassword = async email => {
 export const deleteCurrentUser = async () => {
   try {
     const user = auth.currentUser;
-
+    console.log(`current user is ${user.email}`);
     if (user) {
+      const userEmail = user.email;
+      await deleteUserData(userEmail);
       await deleteUser(user);
       console.log('User deleted successfully from Firebase Authentication!');
       return {success: true, error: null};

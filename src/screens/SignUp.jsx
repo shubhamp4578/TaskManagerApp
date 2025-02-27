@@ -54,7 +54,6 @@ const SignUp = ({navigation}) => {
     setLoading(false);
 
     if (user) {
-      console.log('got the user details');
       const userName = `${firstName} ${lastName}`;
       const isUserSaved = await setUser(email, userName);
       if(isUserSaved) {
